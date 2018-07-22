@@ -1,0 +1,88 @@
+Program = Statement *
+
+Variable = n:(CommonVariable / ProperVariable / Pronoun) {return {t: 'Variable', n}}
+CommonVariable = ('the'/'my'/'your') _ [a-z]+
+ProperVariable = $([A-Z][a-z]+)
+Pronoun = 'it'/'he'/'she'/'him'/'her'/'them'/'they'
+
+// TODO types
+// TODO literals
+
+Comparison = l:SimpleExpression _ b:BoolCheck _ c:Comparator? r:SimpleExpression
+	{ return {t: 'Comparison', l, r, b, c} }
+BoolCheck =
+	(('is'_'not')/"ain't") { return false }
+	/ 'is' { return true }
+Comparator =
+	('higher'/'greater'/'bigger'/'stronger')_'than'_ { return 'gt' }
+    / ('lower'/'less'/'smaller'/'weaker')_'than'_ { return 'lt' }
+    / 'as'_('high'/'great'/'big'/'strong')_'as'_ {return 'ge'}
+    / 'as'_('low'/'little'/'small'/'weak')_'as'_ {return 'le'}
+
+Listen = 'Listen' _ 'to' _ v:Variable
+Say = ('Say'/'Shout'/'Whisper'/'Scream') _ e:Expression
+	{return {t:'Say', e}}
+
+// These are never explicitly defined in the spec
+Expression = BooleanOperation
+SimpleExpression = FunctionCall / Variable / Number / String
+Number = n:$([0-9]+ ('.' [0-9]+)?)
+	{ return {t: 'Number', v: parseFloat(n)} }
+String = v:(StringSingle / StringDouble)
+	{ return {t: 'String', v}}
+StringDouble = '"' v:$[^"]+ '"' {return v}
+StringSingle = "'" v:$[^']+ "'" {return v}
+BooleanOperation =
+	(
+    	l:(Comparison / SimpleExpression)
+        _ b:('and'/'or') _
+        r:Expression
+        { return {t: 'BooleanOperation', l, b, r} }
+    )
+    / l: (Comparison / SimpleExpression) { return l }
+
+Loop = c:('While'/'Until') _ e:Expression
+	{ return {t: 'Loop', c, e} }
+Continue = ('Continue' / ('Take'_'it'_'to'_'the'_'top')) {return {t: 'Continue'}}
+Break = ('Break' / ('Break'_'it'_'down!')) {return {t: 'Break'}}
+// TODO End isn't in spec?
+End = 'End' {return {t: 'End'}}
+
+Statement = _? a:('And' _)? e:(FunctionDeclaration/Operation/BlankLine) '\n' {return {a:!!a,e}}
+BlankLine = '' {return {t: 'BlankLine'}}
+
+FunctionDeclaration = n:Variable _ 'takes' _ a:FunctionDeclarationArguments
+	{ return {t: 'FunctionDeclaration', n: n.n, a: a.map(a => a.n)} }
+FunctionDeclarationArguments = 
+	a:Variable (_'and'_ / _?','_?) b:FunctionDeclarationArguments { return [a].concat(b) }
+    / a:Variable { return [a] }
+
+FunctionCall = f:Variable _ 'taking' _ a:FunctionCallArguments
+	{ return {t: 'FunctionCall', f: f.n, a} }
+// TODO 'and' is overloaded, so can't use full Expression syntax
+FunctionCallArguments = 
+	a:SimpleExpression (_'and'_ / _?','_?) b:FunctionCallArguments { return [a].concat(b) }
+    / a:SimpleExpression { return [a] }
+
+Operation = Loop / If / ArithmeticStatement / GiveBack / Set / Listen / Say / Continue / Break / End
+
+Set = v:Variable _ 'is' _ e:Expression
+	{ return {t: 'Set', v: v.n, e} }
+
+ArithmeticStatement = Take / BuildUp / KnockDown
+// TODO take is not in standard
+Take = 'Take' _ e:Expression _ 'from' _ v:Variable
+	{ return {t: 'Arithmetic', v: v.n, e, o: 'subtract'} }
+BuildUp = 'Build' _ v:Variable _ 'up'
+	{ return {t: 'Arithmetic', v: v.n, e: {t: 'Number', v: 1}, o: 'add'} }
+KnockDown = 'Knock' _ v:Variable _ 'down'
+	{ return {t: 'Arithmetic', v: v.n, e: {t: 'Number', v: 1}, o: 'subtract'} }
+
+GiveBack = 'Give back' _ e:Expression
+	{ return {t: 'GiveBack', e} }
+
+
+If = 'If' _ e:Expression
+	{ return {t: 'If', e} }
+
+_ = (' ' / '\t') +
