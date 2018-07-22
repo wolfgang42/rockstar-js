@@ -1,15 +1,15 @@
 const parser = require('./rockstar-parser')
 const fs = require('fs-extra')
 
-const block = []
+let block = 0
 const generators = {
 	FunctionDeclaration: f => {
-		block.push('function')
+		block++
 		return `function ${f.n} (${f.a.join(', ')}) {`
 	},
 	FunctionCall: f => `${f.f}(${f.a.map(expr).join(', ')})`,
 	Loop: w => {
-		block.push('loop')
+		block++
 		let cond = expr(w.e)
 		if (w.c === 'Until') cond = `!(${cond})`
 		return `while (${cond}) {`
@@ -17,7 +17,7 @@ const generators = {
 	Continue: _ => 'continue',
 	Break: _ => 'break',
 	If: i => {
-		block.push('if')
+		block++
 		return `if (${expr(i.e)}) {`
 	},
 	Comparison: c => {
@@ -47,25 +47,13 @@ const generators = {
 	Set: s => `${s.v} = ${expr(s.e)}`,
 	Number: n => n.v,
 	String: s => JSON.stringify(s.v),
-	GiveBack: g => {
-		let ret = ''
-		// Close all blocks to end of function
-		while (block.pop() != 'function') {
-			if (block.length === 0) throw new Error('Blank line not ending function')
-			ret += '}'
-		}
-		block.push('endfn')
-		return ret + `return ${expr(g.e)}`
-	},
+	GiveBack: g => `return ${expr(g.e)}`,
 	BlankLine: _ => {
-		if (block.pop() != 'endfn') throw new Error('Blank line without end of function')
+		block--
 		return '}'
 	},
 	Say: s=>`console.log(${expr(s.e)})`,
-	End: _ => {
-		if (block.pop() != 'loop') throw new Error('End keyword without end of loop')
-		return '}'
-	},
+
 }
 
 function expr(e) {
@@ -86,6 +74,7 @@ async function compile(filename) {
 			block.pop()
 		}
 	})
+	while (block--) console.log('}')
 }
 
 compile(process.argv[2]).then(null, e => {

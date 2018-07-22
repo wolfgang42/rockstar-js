@@ -1,6 +1,6 @@
 Program = Statement *
 Statement = _? a:('And' _)? e:(FunctionDeclaration/Operation/BlankLine) '\n' {return {a:!!a,e}}
-Operation = Loop / If / ArithmeticStatement / GiveBack / Set / Listen / Say / Continue / Break / End
+Operation = Loop / If / ArithmeticStatement / GiveBack / Set / Listen / Say / Continue / Break
 _ = (' ' / '\t') +
 
 Variable = n:(CommonVariable / ProperVariable / Pronoun) {return {t: 'Variable', n}}
@@ -37,13 +37,12 @@ Say = ('Say'/'Shout'/'Whisper'/'Scream') _ e:Expression
 
 If = 'If' _ e:Expression
 	{ return {t: 'If', e} }
+// TODO else
 
 Loop = c:('While'/'Until') _ e:Expression
 	{ return {t: 'Loop', c, e} }
 Continue = ('Continue' / ('Take'_'it'_'to'_'the'_'top')) {return {t: 'Continue'}}
 Break = ('Break' / ('Break'_'it'_'down')) {return {t: 'Break'}}
-// TODO End isn't in spec?
-End = ('End'/'And'_'around'_'we'_'go') {return {t: 'End'}}
 
 FunctionDeclaration = n:Variable _ 'takes' _ a:FunctionDeclarationArguments
 	{ return {t: 'FunctionDeclaration', n: n.n, a: a.map(a => a.n)} }
