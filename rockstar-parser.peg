@@ -41,7 +41,7 @@ If = 'If' _ e:Expression
 Loop = c:('While'/'Until') _ e:Expression
 	{ return {t: 'Loop', c, e} }
 Continue = ('Continue' / ('Take'_'it'_'to'_'the'_'top')) {return {t: 'Continue'}}
-Break = ('Break' / ('Break'_'it'_'down!')) {return {t: 'Break'}}
+Break = ('Break' / ('Break'_'it'_'down')) {return {t: 'Break'}}
 // TODO End isn't in spec?
 End = ('End'/'And'_'around'_'we'_'go') {return {t: 'End'}}
 
