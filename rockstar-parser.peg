@@ -1,6 +1,6 @@
 Program = Statement *
 Statement = _? a:('And' _)? e:(FunctionDeclaration/Operation/BlankLine) '\n' {return {a:!!a,e}}
-Operation = Loop / If / ArithmeticStatement / GiveBack / Set / Listen / Say / Continue / Break
+Operation = Loop / If / ArithmeticStatement / GiveBack / Set / Put / Listen / Say / Continue / Break
 _ = (' ' / '\t') +
 
 Variable = n:(CommonVariable / ProperVariable / Pronoun) {return {t: 'Variable', n}}
@@ -14,11 +14,23 @@ String = '"' v:$[^"]+ '"'
 Number = n:$([0-9]+ ('.' [0-9]+)?)
 	{ return {t: 'Number', v: parseFloat(n)} }
 
-ArithmeticStatement = Take / BuildUp / KnockDown
+ArithmeticStatement = BuildUp / KnockDown
 BuildUp = 'Build' _ v:Variable _ 'up'
-	{ return {t: 'Arithmetic', v: v.n, e: {t: 'Number', v: 1}, o: 'add'} }
+	{ return {t: 'Rement', v: v.n, o: '++'} }
 KnockDown = 'Knock' _ v:Variable _ 'down'
-	{ return {t: 'Arithmetic', v: v.n, e: {t: 'Number', v: 1}, o: 'subtract'} }
+	{ return {t: 'Rement', v: v.n, o: '--'} }
+
+ArithmeticExpression =
+	l:SimpleExpression
+	_ o:ArithmeticOperator _
+	r:SimpleExpression
+	{ return {t: 'Arithmetic', l, o, r} }
+ArithmeticOperator =
+	('minus'/'without') {return '-'}
+	/ ('plus'/'with') {return '+'}
+	/ ('times'/'of') {return '*'}
+	/ ('over') {return '/'}
+
 
 Comparison = l:SimpleExpression _ b:BoolCheck _ c:Comparator? r:SimpleExpression
 	{ return {t: 'Comparison', l, r, b, c} }
@@ -64,7 +76,7 @@ FunctionCallArguments =
 
 ///////////////////////
 // TODO Everything below here is never explicitly defined in the spec
-Expression = BooleanOperation
+Expression = ArithmeticExpression / BooleanOperation
 SimpleExpression = FunctionCall / Variable / Number / String
 BooleanOperation =
 	(
@@ -77,6 +89,5 @@ BooleanOperation =
 
 Set = v:Variable _ 'is' _ e:Expression
 	{ return {t: 'Set', v: v.n, e} }
-
-Take = 'Take' _ e:Expression _ 'from' _ v:Variable
-	{ return {t: 'Arithmetic', v: v.n, e, o: 'subtract'} }
+Put = 'Put' _ e:Expression _ 'into' _ v:Variable
+	{ return {t: 'Set', v: v.n, e} }

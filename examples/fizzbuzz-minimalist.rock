@@ -1,6 +1,6 @@
 Modulus takes Number and Divisor
-While Number is higher than Divisor
-Take Divisor from Number
+While Number is as high as Divisor
+Put Number minus Divisor into Number
 
 Give back Number
 
