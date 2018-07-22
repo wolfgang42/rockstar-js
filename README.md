@@ -5,8 +5,8 @@ It transpiles Rockstar code to JavaScript.
 Usage:
 ```
 yarn install
-node_modules/.bin/pegjs rockstar-parser.peg
-node ./rockstar.js program.rock
+node_modules/.bin/pegjs src/rockstar-parser.peg
+node ./src/rockstar.js program.rock
 ```
 
 **Note:** Due to the extremely fast speed of updates to Rockstar, this implementation may not always match the current spec. [wolfgang42/rockstar](https://github.com/wolfgang42/rockstar) has the version of this spec targeted by this implementation.
