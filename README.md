@@ -5,6 +5,7 @@ It transpiles Rockstar code to JavaScript.
 Usage:
 ```
 yarn install
+node_modules/.bin/pegjs rockstar-parser.peg
 node ./rockstar.js program.rock
 ```
 
