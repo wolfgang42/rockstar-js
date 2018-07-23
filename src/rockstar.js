@@ -1,24 +1,21 @@
 const parser = require('./rockstar-parser')
 const fs = require('fs-extra')
 
-let block = 0
 const generators = {
+	Block: b => `{${b.s.map(expr).join('')}}`,
 	FunctionDeclaration: f => {
-		block++
-		return `function ${f.n} (${f.a.join(', ')}) {`
+		return `function ${f.n} (${f.a.join(', ')})`
 	},
 	FunctionCall: f => `${f.f}(${f.a.map(expr).join(', ')})`,
 	Loop: w => {
-		block++
 		let cond = expr(w.e)
 		if (w.c === 'Until') cond = `!(${cond})`
-		return `while (${cond}) {`
+		return `while (${cond})`
 	},
-	Continue: _ => 'continue',
-	Break: _ => 'break',
+	Continue: _ => 'continue;',
+	Break: _ => 'break;',
 	If: i => {
-		block++
-		return `if (${expr(i.e)}) {`
+		return `if (${expr(i.e)})`
 	},
 	Comparison: c => {
 		let ret = expr(c.l)
@@ -43,17 +40,13 @@ const generators = {
 	},
 	BooleanOperation: b => `${expr(b.l)} ${b.b=='and'?'&&':'||'} ${expr(b.r)}`,
 	Variable: v => v.n,
-	Rement: r => `${r.v}${r.o}`,
+	Rement: r => `${r.v}${r.o};`,
 	Arithmetic: a => `${expr(a.l)} ${a.o} ${expr(a.r)}`,
-	Set: s => `${s.v} = ${expr(s.e)}`,
+	Set: s => `${s.v} = ${expr(s.e)};`,
 	Number: n => n.v,
 	String: s => JSON.stringify(s.v),
-	GiveBack: g => `return ${expr(g.e)}`,
-	BlankLine: _ => {
-		block--
-		return '}'
-	},
-	Say: s=>`console.log(${expr(s.e)})`,
+	GiveBack: g => `return ${expr(g.e)};`,
+	Say: s=>`console.log(${expr(s.e)});`,
 
 }
 
@@ -65,12 +58,26 @@ function expr(e) {
 	return generators[e.t](e)
 }
 
+function ast(statements) {
+	let ret = []
+	let stmt
+	while (stmt = statements.shift()) {
+		if (stmt.t == 'BlankLine') return ret
+		ret.push(stmt)
+		if (stmt.t == 'If' || stmt.t == 'Loop' || stmt.t == 'FunctionDeclaration') {
+			ret.push({
+				t: 'Block',
+				s: ast(statements),
+			})
+		}
+	}
+	return ret
+}
+
 async function compile(filename) {
 	const statements = parser.parse(await fs.readFile(filename, 'utf-8'))
-	statements.forEach((stmt, i) => {
-		console.log(expr(stmt))
-	})
-	while (block--) console.log('}')
+	const program = ast(statements)
+	console.log(program.map(expr).join(''))
 }
 
 compile(process.argv[2]).then(null, e => {
