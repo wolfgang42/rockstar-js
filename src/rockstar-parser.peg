@@ -1,13 +1,14 @@
 Program = Statement *
-Statement = _? s:(FunctionDeclaration/Operation/BlankLine) _? '\n' {return s}
-Operation = Loop / If / ArithmeticStatement / GiveBack / Set / Put / Listen / Say / Continue / Break
+Statement = _? s:(FunctionDeclaration/Operation/BlankLine) _* '\n' {return s}
+Operation = Loop / If / ArithmeticStatement / GiveBack / Set / Put / Listen / Say / Continue / Break / PoeticString
 _ = ((' ' / '\t')+) / Comment
 Comment = '(' [^)]* ')'
 
 Variable = n:(CommonVariable / ProperVariable / Pronoun) {return {t: 'Variable', n}}
-CommonVariable = ('the'/'my'i/'your') _ v:$([a-z]+) {return v}
-ProperVariable = $([A-Z][a-z]+)
-Pronoun = 'it'/'he'/'she'/'him'/'her'/'them'/'they'
+CommonVariable = ('the'i/'my'i/'your'i) _ v:$([a-z]+) {return v}
+ProperWord = $([A-Z][A-Za-z]+)
+ProperVariable = $(ProperWord _ ProperVariable) / $ProperWord
+Pronoun = 'it'i/'he'i/'she'i/'him'i/'her'i/'them'i/'they'i
 
 TypeLiteral = v:TypeLiteralValue { return {t: 'Literal', v} }
 TypeLiteralValue =
@@ -28,11 +29,15 @@ BuildUp = 'Build' _ v:Variable _ 'up'
 KnockDown = 'Knock' _ v:Variable _ 'down'
 	{ return {t: 'Rement', v: v.n, o: '--'} }
 
-PoeticNumber = n:PoeticDigits {return {t: 'Literal', v: parseInt(n)}}
+PoeticString = v:Variable _ 'says' ' ' t:$[^\n]*
+	{ return {t: 'Set', v: v.n, e: {t: 'Literal', v: t}} }
+
+PoeticNumber = n:PoeticDigits d:PoeticDecimal? {return {t: 'Literal', v: parseFloat(d?n+'.'+d:n)}}
+PoeticDecimal = '.' _ d:PoeticDigits {return d}
 PoeticDigits =
 	l:PoeticDigit _ r:PoeticDigits { return l+r }
 	/ d: PoeticDigit { return d }
-PoeticDigit = t:[a-z]+ {return (t.length%10).toString()}
+PoeticDigit = t:[A-Za-z]+ {return (t.length%10).toString()}
 
 ArithmeticExpression =
 	l:SimpleExpression
@@ -100,7 +105,7 @@ BooleanOperation =
     )
     / l: (Comparison / SimpleExpression) { return l }
 
-Set = v:Variable _ 'is' _ e:Expression
+Set = v:Variable _ ('is'/'was'/'were') _ e:Expression
 	{ return {t: 'Set', v: v.n, e} }
 Put = 'Put' _ e:Expression _ 'into' _ v:Variable
 	{ return {t: 'Set', v: v.n, e} }
