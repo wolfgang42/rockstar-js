@@ -10,10 +10,10 @@ ProperVariable = $([A-Z][a-z]+)
 Pronoun = 'it'/'he'/'she'/'him'/'her'/'them'/'they'
 
 String = '"' v:$[^"]+ '"'
-	{ return {t: 'String', v}}
+	{ return {t: 'Literal', v}}
 
 Number = n:$([0-9]+ ('.' [0-9]+)?)
-	{ return {t: 'Number', v: parseFloat(n)} }
+	{ return {t: 'Literal', v: parseFloat(n)} }
 
 ArithmeticStatement = BuildUp / KnockDown
 BuildUp = 'Build' _ v:Variable _ 'up'

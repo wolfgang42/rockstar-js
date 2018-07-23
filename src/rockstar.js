@@ -39,8 +39,7 @@ const generators = {
 	Rement: r => `${r.v}${r.o};`,
 	Arithmetic: a => `${expr(a.l)}${a.o}${expr(a.r)}`,
 	Set: s => `${s.v}=${expr(s.e)};`,
-	Number: n => n.v,
-	String: s => JSON.stringify(s.v),
+	Literal: l => JSON.stringify(l.v),
 	GiveBack: g => `return ${expr(g.e)};`,
 	Say: s=>`console.log(${expr(s.e)});`,
 
