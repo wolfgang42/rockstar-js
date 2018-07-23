@@ -3,9 +3,7 @@ const fs = require('fs-extra')
 
 const generators = {
 	Block: b => `{${b.s.map(expr).join('')}}`,
-	FunctionDeclaration: f => {
-		return `function ${f.n} (${f.a.join(', ')})`
-	},
+	FunctionDeclaration: f => `function ${f.n} (${f.a.join(', ')})`,
 	FunctionCall: f => `${f.f}(${f.a.map(expr).join(', ')})`,
 	Loop: w => {
 		let cond = expr(w.e)
@@ -14,9 +12,7 @@ const generators = {
 	},
 	Continue: _ => 'continue;',
 	Break: _ => 'break;',
-	If: i => {
-		return `if (${expr(i.e)})`
-	},
+	If: i => `if (${expr(i.e)})`,
 	Comparison: c => {
 		let ret = expr(c.l)
 		if (c.c) {
