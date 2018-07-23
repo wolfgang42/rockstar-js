@@ -3,16 +3,16 @@ const fs = require('fs-extra')
 
 const generators = {
 	Block: b => `{${b.s.map(expr).join('')}}`,
-	FunctionDeclaration: f => `function ${f.n} (${f.a.join(', ')})`,
-	FunctionCall: f => `${f.f}(${f.a.map(expr).join(', ')})`,
+	FunctionDeclaration: f => `function ${f.n}(${f.a.join(',')})`,
+	FunctionCall: f => `${f.f}(${f.a.map(expr).join(',')})`,
 	Loop: w => {
 		let cond = expr(w.e)
 		if (w.c === 'Until') cond = `!(${cond})`
-		return `while (${cond})`
+		return `while(${cond})`
 	},
 	Continue: _ => 'continue;',
 	Break: _ => 'break;',
-	If: i => `if (${expr(i.e)})`,
+	If: i => `if(${expr(i.e)})`,
 	Comparison: c => {
 		let ret = expr(c.l)
 		if (c.c) {
@@ -34,11 +34,11 @@ const generators = {
 		if (!c && !b) ret = `!(${ret})`
 		return ret
 	},
-	BooleanOperation: b => `${expr(b.l)} ${b.b=='and'?'&&':'||'} ${expr(b.r)}`,
+	BooleanOperation: b => `${expr(b.l)}${b.b=='and'?'&&':'||'}${expr(b.r)}`,
 	Variable: v => v.n,
 	Rement: r => `${r.v}${r.o};`,
-	Arithmetic: a => `${expr(a.l)} ${a.o} ${expr(a.r)}`,
-	Set: s => `${s.v} = ${expr(s.e)};`,
+	Arithmetic: a => `${expr(a.l)}${a.o}${expr(a.r)}`,
+	Set: s => `${s.v}=${expr(s.e)};`,
 	Number: n => n.v,
 	String: s => JSON.stringify(s.v),
 	GiveBack: g => `return ${expr(g.e)};`,
