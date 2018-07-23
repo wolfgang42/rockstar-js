@@ -4,11 +4,13 @@ Operation = Loop / If / ArithmeticStatement / GiveBack / Set / Put / Listen / Sa
 _ = ((' ' / '\t')+) / Comment
 Comment = '(' [^)]* ')'
 
-Variable = n:(CommonVariable / ProperVariable / Pronoun) {return {t: 'Variable', n}}
+Variable =
+	(n:(CommonVariable / ProperVariable) {return {t: 'Variable', n}})
+	/ Pronoun {return {t: 'Pronoun'}}
 CommonVariable = ('the'i/'my'i/'your'i) _ v:$([a-z]+) {return v}
 ProperWord = $([A-Z][A-Za-z]+)
 ProperVariable = $(ProperWord _ ProperVariable) / $ProperWord
-Pronoun = 'it'i/'he'i/'she'i/'him'i/'her'i/'them'i/'they'i
+Pronoun = ('it'i/'he'i/'she'i/'him'i/'her'i/'them'i/'they'i)
 
 TypeLiteral = v:TypeLiteralValue { return {t: 'Literal', v} }
 TypeLiteralValue =
@@ -25,12 +27,12 @@ Number = n:$([0-9]+ ('.' [0-9]+)?)
 
 ArithmeticStatement = BuildUp / KnockDown
 BuildUp = 'Build' _ v:Variable _ 'up'
-	{ return {t: 'Rement', v: v.n, o: '++'} }
+	{ return {t: 'Rement', v: v, o: '++'} }
 KnockDown = 'Knock' _ v:Variable _ 'down'
-	{ return {t: 'Rement', v: v.n, o: '--'} }
+	{ return {t: 'Rement', v: v, o: '--'} }
 
 PoeticString = v:Variable _ 'says' ' ' t:$[^\n]*
-	{ return {t: 'Set', v: v.n, e: {t: 'Literal', v: t}} }
+	{ return {t: 'Set', v: v, e: {t: 'Literal', v: t}} }
 
 PoeticNumber = n:PoeticDigits d:PoeticDecimal? {return {t: 'Literal', v: parseFloat(d?n+'.'+d:n)}}
 PoeticDecimal = '.' _ d:PoeticDigits {return d}
@@ -106,6 +108,6 @@ BooleanOperation =
     / l: (Comparison / SimpleExpression) { return l }
 
 Set = v:Variable _ ('is'/'was'/'were') _ e:Expression
-	{ return {t: 'Set', v: v.n, e} }
+	{ return {t: 'Set', v: v, e} }
 Put = 'Put' _ e:Expression _ 'into' _ v:Variable
-	{ return {t: 'Set', v: v.n, e} }
+	{ return {t: 'Set', v: v, e} }
