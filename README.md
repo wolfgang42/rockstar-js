@@ -7,6 +7,7 @@ Usage:
 yarn install
 yarn build
 yarn run transpile program.rock
+node program.js
 ```
 
 **Note:** Due to the extremely fast speed of updates to Rockstar, this implementation may not always match the current spec. [wolfgang42/rockstar](https://github.com/wolfgang42/rockstar) has the version of this spec targeted by this implementation.

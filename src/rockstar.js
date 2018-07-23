@@ -77,10 +77,12 @@ function ast(statements) {
 async function compile(filename) {
 	const statements = parser.parse(await fs.readFile(filename, 'utf-8'))
 	const program = ast(statements)
-	console.log(program.map(expr).join(''))
+	return program.map(expr).join('')
 }
 
-compile(process.argv[2]).then(null, e => {
+compile(process.argv[2]).then(
+	code => fs.writeFile(process.argv[2].replace('.rock', '.js'), code)
+).then(null, e => {
 	console.error(e)
 	process.exit(1)
 })
