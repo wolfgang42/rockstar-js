@@ -68,12 +68,7 @@ function expr(e) {
 async function compile(filename) {
 	const statements = parser.parse(await fs.readFile(filename, 'utf-8'))
 	statements.forEach((stmt, i) => {
-		console.log(expr(stmt.e))
-		const nextAnd = statements[i+1] && statements[i+1].a
-		if (stmt.e.t != 'If' && block[block.length-1] == 'if' && !nextAnd) {
-			console.log('}')
-			block.pop()
-		}
+		console.log(expr(stmt))
 	})
 	while (block--) console.log('}')
 }

@@ -1,5 +1,5 @@
 Program = Statement *
-Statement = _? a:('And' _)? e:(FunctionDeclaration/Operation/BlankLine) '\n' {return {a:!!a,e}}
+Statement = _? s:(FunctionDeclaration/Operation/BlankLine) '\n' {return s}
 Operation = Loop / If / ArithmeticStatement / GiveBack / Set / Put / Listen / Say / Continue / Break
 _ = (' ' / '\t') +
 
