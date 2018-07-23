@@ -1,7 +1,8 @@
 Program = Statement *
-Statement = _? s:(FunctionDeclaration/Operation/BlankLine) '\n' {return s}
+Statement = _? s:(FunctionDeclaration/Operation/BlankLine) _? '\n' {return s}
 Operation = Loop / If / ArithmeticStatement / GiveBack / Set / Put / Listen / Say / Continue / Break
-_ = (' ' / '\t') +
+_ = ((' ' / '\t')+) / Comment
+Comment = '(' [^)]* ')'
 
 Variable = n:(CommonVariable / ProperVariable / Pronoun) {return {t: 'Variable', n}}
 CommonVariable = ('the'/'my'/'your') _ [a-z]+
