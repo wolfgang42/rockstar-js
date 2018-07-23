@@ -3,8 +3,8 @@ const fs = require('fs-extra')
 
 const generators = {
 	Block: b => `{${b.s.map(expr).join('')}}`,
-	FunctionDeclaration: f => `function ${f.n}(${f.a.join(',')})`,
-	FunctionCall: f => `${f.f}(${f.a.map(expr).join(',')})`,
+	FunctionDeclaration: f => `function ${varname(f.n)}(${f.a.map(varname).join(',')})`,
+	FunctionCall: f => `${varname(f.f)}(${f.a.map(expr).join(',')})`,
 	Loop: w => {
 		let cond = expr(w.e)
 		if (w.c === 'Until') cond = `!(${cond})`
@@ -35,14 +35,17 @@ const generators = {
 		return ret
 	},
 	BooleanOperation: b => `${expr(b.l)}${b.b=='and'?'&&':'||'}${expr(b.r)}`,
-	Variable: v => v.n,
+	Variable: v => varname(v.n),
 	Rement: r => `${r.v}${r.o};`,
 	Arithmetic: a => `${expr(a.l)}${a.o}${expr(a.r)}`,
-	Set: s => `${s.v}=${expr(s.e)};`,
+	Set: s => `${varname(s.v)}=${expr(s.e)};`,
 	Literal: l => JSON.stringify(l.v),
 	GiveBack: g => `return ${expr(g.e)};`,
 	Say: s=>`console.log(${expr(s.e)});`,
+}
 
+function varname(v) {
+	return v.replace(/ /g, '')
 }
 
 function expr(e) {
