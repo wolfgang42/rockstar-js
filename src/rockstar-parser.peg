@@ -5,9 +5,16 @@ _ = ((' ' / '\t')+) / Comment
 Comment = '(' [^)]* ')'
 
 Variable = n:(CommonVariable / ProperVariable / Pronoun) {return {t: 'Variable', n}}
-CommonVariable = ('the'/'my'/'your') _ [a-z]+
+CommonVariable = ('the'/'my'i/'your') _ v:$([a-z]+) {return v}
 ProperVariable = $([A-Z][a-z]+)
 Pronoun = 'it'/'he'/'she'/'him'/'her'/'them'/'they'
+
+TypeLiteral = v:TypeLiteralValue { return {t: 'Literal', v} }
+TypeLiteralValue =
+	('nothing'/'nobody'/'nowhere') {return 0} // TODO null?
+	/ ('true'/'right'/'yes'/'ok') {return true}
+    / ('false'/'wrong'/'no'/'lies') {return false}
+    / 'mysterious' { return undefined}
 
 String = '"' v:$[^"]+ '"'
 	{ return {t: 'Literal', v}}
@@ -21,6 +28,12 @@ BuildUp = 'Build' _ v:Variable _ 'up'
 KnockDown = 'Knock' _ v:Variable _ 'down'
 	{ return {t: 'Rement', v: v.n, o: '--'} }
 
+PoeticNumber = n:PoeticDigits {return {t: 'Literal', v: parseInt(n)}}
+PoeticDigits =
+	l:PoeticDigit _ r:PoeticDigits { return l+r }
+	/ d: PoeticDigit { return d }
+PoeticDigit = t:[a-z]+ {return (t.length%10).toString()}
+
 ArithmeticExpression =
 	l:SimpleExpression
 	_ o:ArithmeticOperator _
@@ -32,12 +45,11 @@ ArithmeticOperator =
 	/ ('times'/'of') {return '*'}
 	/ ('over') {return '/'}
 
-
-Comparison = l:SimpleExpression _ b:BoolCheck _ c:Comparator? r:SimpleExpression
+Comparison = l:SimpleExpression _ b:BoolCheck c:Comparator? r:SimpleExpression
 	{ return {t: 'Comparison', l, r, b, c} }
 BoolCheck =
-	(('is'_'not')/"ain't") { return false }
-	/ 'is' { return true }
+	(('is'_'not'_)/"ain't"_) { return false }
+	/ 'is'_ { return true }
 Comparator =
 	('higher'/'greater'/'bigger'/'stronger')_'than'_ { return 'gt' }
     / ('lower'/'less'/'smaller'/'weaker')_'than'_ { return 'lt' }
@@ -78,7 +90,7 @@ FunctionCallArguments =
 ///////////////////////
 // TODO Everything below here is never explicitly defined in the spec
 Expression = ArithmeticExpression / BooleanOperation
-SimpleExpression = FunctionCall / Variable / Number / String
+SimpleExpression = FunctionCall / TypeLiteral / Variable / Number / String / PoeticNumber
 BooleanOperation =
 	(
     	l:(Comparison / SimpleExpression)

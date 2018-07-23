@@ -72,6 +72,7 @@ function ast(statements) {
 async function compile(filename) {
 	const statements = parser.parse(await fs.readFile(filename, 'utf-8'))
 	const program = ast(statements)
+	if (statements.length !== 0) throw new Error('Too many blank lines, left last block with some program left')
 	return program.map(expr).join('')
 }
 
