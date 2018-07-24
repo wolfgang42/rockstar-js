@@ -13,6 +13,7 @@ const generators = {
 	Continue: _ => 'continue;',
 	Break: _ => 'break;',
 	If: i => `if(${expr(i.e)})`,
+	Else: _ => 'else',
 	Comparison: c => {
 		let ret = expr(c.l)
 		if (c.c) {
@@ -66,7 +67,7 @@ function _findBlocks(statements) {
 	while (stmt = statements.shift()) {
 		if (stmt.t == 'BlankLine') return ret
 		ret.push(stmt)
-		if (stmt.t == 'If' || stmt.t == 'Loop' || stmt.t == 'FunctionDeclaration') {
+		if (stmt.t == 'If' || stmt.t == 'Else' || stmt.t == 'Loop' || stmt.t == 'FunctionDeclaration') {
 			ret.push({
 				t: 'Block',
 				s: _findBlocks(statements),

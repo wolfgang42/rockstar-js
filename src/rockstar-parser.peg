@@ -69,7 +69,7 @@ Say = ('Say'/'Shout'/'Whisper'/'Scream') _ e:Expression
 
 If = 'If' _ e:Expression
 	{ return {t: 'If', e} }
-// TODO else
+Else = 'Else' {return {t: 'Else'}}
 
 Loop = c:('While'/'Until') _ e:Expression
 	{ return {t: 'Loop', c, e} }
