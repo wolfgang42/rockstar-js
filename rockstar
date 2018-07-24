@@ -1,0 +1,13 @@
+#!/usr/bin/env node
+const rockstar = require('./src/rockstar')
+const fs = require('fs-extra')
+
+const filename = process.argv[2]
+
+fs.readFile(filename, 'utf-8')
+.then(rockstar.compile)
+.then(code => fs.writeFile(filename.replace('.rock', '.js'), code))
+.then(null, e => {
+	console.error(e)
+	process.exit(1)
+})

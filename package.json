@@ -4,7 +4,6 @@
     "pegjs": "^0.10.0"
   },
   "scripts": {
-    "build": "pegjs src/rockstar-parser.peg",
-    "transpile": "node ./src/rockstar.js"
+    "build": "pegjs src/rockstar-parser.peg"
   }
 }

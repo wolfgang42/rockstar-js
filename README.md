@@ -6,7 +6,7 @@ Usage:
 ```
 yarn install
 yarn build
-yarn run transpile program.rock
+./rockstar program.rock
 node program.js
 ```
 

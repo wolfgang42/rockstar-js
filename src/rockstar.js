@@ -1,5 +1,4 @@
 const parser = require('./rockstar-parser')
-const fs = require('fs-extra')
 
 let it
 const generators = {
@@ -61,7 +60,7 @@ function expr(e) {
 	return generators[e.t](e)
 }
 
-function ast(statements) {
+function _findBlocks(statements) {
 	let ret = []
 	let stmt
 	while (stmt = statements.shift()) {
@@ -70,25 +69,32 @@ function ast(statements) {
 		if (stmt.t == 'If' || stmt.t == 'Loop' || stmt.t == 'FunctionDeclaration') {
 			ret.push({
 				t: 'Block',
-				s: ast(statements),
+				s: _findBlocks(statements),
 			})
 		}
 	}
 	return ret
 }
-
-
-async function compile(filename) {
-	const statements = parser.parse(await fs.readFile(filename, 'utf-8'))
-	const program = ast(statements)
+function findBlocks(statements) {
+	const ret = _findBlocks(statements)
 	if (statements.length !== 0) throw new Error('Too many blank lines, left last block with some program left')
+	return ret
+}
+
+function parse(programText) {
+	return parser.parse(programText)
+}
+
+function compile(programText) {
+	const statements = parse(programText)
+	const program = findBlocks(statements)
 	return program.map(expr).join('')
 }
 
-compile(process.argv[2]).then(
-	code => fs.writeFile(process.argv[2].replace('.rock', '.js'), code)
-).then(null, e => {
-	console.error(e)
-	process.exit(1)
-})
-
+module.exports = {
+	varname,
+	expr,
+	findBlocks,
+	parse,
+	compile,
+}
