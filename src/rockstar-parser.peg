@@ -50,7 +50,7 @@ ArithmeticOperator =
 	('minus'/'without') {return '-'}
 	/ ('plus'/'with') {return '+'}
 	/ ('times'/'of') {return '*'}
-	/ ('over') {return '/'}
+	/ ('over'/'by') {return '/'}
 
 Comparison = l:SimpleExpression _ b:BoolCheck c:Comparator? r:SimpleExpression
 	{ return {t: 'Comparison', l, r, b, c} }
