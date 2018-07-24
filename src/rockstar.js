@@ -61,7 +61,7 @@ function expr(e) {
 	return generators[e.t](e)
 }
 
-function _findBlocks(statements) {
+function _groupBlocks(statements) {
 	let ret = []
 	let stmt
 	while (stmt = statements.shift()) {
@@ -70,14 +70,14 @@ function _findBlocks(statements) {
 		if (stmt.t == 'If' || stmt.t == 'Else' || stmt.t == 'Loop' || stmt.t == 'FunctionDeclaration') {
 			ret.push({
 				t: 'Block',
-				s: _findBlocks(statements),
+				s: _groupBlocks(statements),
 			})
 		}
 	}
 	return ret
 }
-function findBlocks(statements) {
-	const ret = _findBlocks(statements)
+function groupBlocks(statements) {
+	const ret = _groupBlocks(statements)
 	if (statements.length !== 0) throw new Error('Too many blank lines, left last block with some program left')
 	return ret
 }
@@ -88,14 +88,14 @@ function parse(programText) {
 
 function compile(programText) {
 	const statements = parse(programText)
-	const program = findBlocks(statements)
+	const program = groupBlocks(statements)
 	return program.map(expr).join('')
 }
 
 module.exports = {
 	varname,
 	expr,
-	findBlocks,
+	groupBlocks,
 	parse,
 	compile,
 }
