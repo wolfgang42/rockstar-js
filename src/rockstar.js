@@ -41,7 +41,7 @@ const generators = {
 		return varname(v.n)
 	},
 	Pronoun: p => expr(it),
-	Rement: r => `${r.v}${r.o};`,
+	Rement: r => `${expr(r.v)}${r.o};`,
 	Arithmetic: a => `${expr(a.l)}${a.o}${expr(a.r)}`,
 	Set: s => `${expr(s.v)}=${expr(s.e)};`,
 	Literal: l => JSON.stringify(l.v),

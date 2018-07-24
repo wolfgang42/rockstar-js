@@ -77,7 +77,7 @@ Continue = ('Continue' / ('Take'_'it'_'to'_'the'_'top')) {return {t: 'Continue'}
 Break = ('Break' / ('Break'_'it'_'down')) {return {t: 'Break'}}
 
 FunctionDeclaration = n:Variable _ 'takes' _ a:FunctionDeclarationArguments
-	{ return {t: 'FunctionDeclaration', n: n.n, a: a.map(a => a.n)} }
+	{ return {t: 'FunctionDeclaration', n, a: a.map(a => a.n)} }
 FunctionDeclarationArguments = 
 	a:Variable (_'and'_ / _?','_?) b:FunctionDeclarationArguments { return [a].concat(b) }
     / a:Variable { return [a] }
@@ -87,7 +87,7 @@ BlankLine = '' {return {t: 'BlankLine'}}
 
 
 FunctionCall = f:Variable _ 'taking' _ a:FunctionCallArguments
-	{ return {t: 'FunctionCall', f: f.n, a} }
+	{ return {t: 'FunctionCall', f, a} }
 // TODO 'and' is overloaded, so can't use full Expression syntax
 FunctionCallArguments = 
 	a:SimpleExpression (_'and'_ / _?','_?) b:FunctionCallArguments { return [a].concat(b) }
