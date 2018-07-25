@@ -14,7 +14,7 @@ Pronoun = ('it'i/'he'i/'she'i/'him'i/'her'i/'them'i/'they'i)
 
 TypeLiteral = v:TypeLiteralValue { return {t: 'Literal', v} }
 TypeLiteralValue =
-	('nothing'/'nobody'/'nowhere') {return 0} // TODO null?
+	('nothing'/'nobody'/'nowhere'/'empty'/'gone') {return 0} // TODO null?
 	/ ('true'/'right'/'yes'/'ok') {return true}
     / ('false'/'wrong'/'no'/'lies') {return false}
     / 'mysterious' { return undefined}
