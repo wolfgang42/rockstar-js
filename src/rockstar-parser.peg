@@ -64,6 +64,7 @@ Comparator =
     / 'as'_('low'/'little'/'small'/'weak')_'as'_ {return 'le'}
 
 Listen = 'Listen' _ 'to' _ v:Variable
+	{return {t:'Listen', v}}
 Say = ('Say'/'Shout'/'Whisper'/'Scream') _ e:Expression
 	{return {t:'Say', e}}
 
