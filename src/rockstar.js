@@ -47,6 +47,24 @@ const generators = {
 	Literal: l => JSON.stringify(l.v),
 	GiveBack: g => `return ${expr(g.e)};`,
 	Say: s=>`console.log(${expr(s.e)});`,
+	Listen: ({ v }) => `${varname(v.n)} = $readLineSync();`
+}
+
+const dependencies = {
+	addReadLine: `
+		function $readLineSync() {
+			const line = [];
+			const buffer = Buffer.alloc(1);
+			while (true) {
+				const bytes = $fs.readSync(1, buffer, 0, 1, null);
+				if (!bytes) break;
+				if (buffer[0] === 10 || buffer[0] === 13) break;
+				line.push(buffer[0]);
+			}
+			return Buffer.from(line).toString('utf-8');
+		}
+		`,
+	fs: `const $fs = require('fs');`,
 }
 
 function varname(v) {
@@ -82,14 +100,32 @@ function groupBlocks(statements) {
 	return ret
 }
 
+function computeDependencies(statements) {
+	const deps = [];
+	if (statements.some(s => s.t === 'Listen')) {
+		deps.push('fs', 'addReadLine');
+	}
+	// TODO: (eventually) remove dup `deps`
+	return deps;
+}
+
+function generateDependencies(deps) {
+	return deps.map(d => dependencies[d]);
+}
+
 function parse(programText) {
 	return parser.parse(programText)
 }
 
 function compile(programText) {
 	const statements = parse(programText)
+	const dependencies = generateDependencies(computeDependencies(statements));
 	const program = groupBlocks(statements)
-	return program.map(expr).join('')
+
+	return [
+		...dependencies,
+		...program.map(expr)
+	].join('')
 }
 
 module.exports = {
@@ -98,4 +134,6 @@ module.exports = {
 	groupBlocks,
 	parse,
 	compile,
+	computeDependencies,
+	generateDependencies,
 }
