@@ -1,9 +1,25 @@
 {
+  "name": "rockstar-js",
+  "description": "JavaScript transpiler for the esoteric language 'Rockstar'",
+  "homepage": "https://github.com/wolfgang42/rockstar-js",
+  "bugs": "https://github.com/wolfgang42/rockstar-js/issues",
+  "repository": "github:wolfgang42/rockstar-js",
+  "license": "MIT",
+  "author": "Wolfgang Faust",
+  "main": "src/rockstar.js",
+  "bin": "./rockstar",
+  "directories": {
+    "lib": "src/",
+    "example": "examples/"
+  },
   "dependencies": {
-    "fs-extra": "^7.0.0",
+    "fs-extra": "^7.0.0"
+  },
+  "devDependencies": {
     "pegjs": "^0.10.0"
   },
   "scripts": {
-    "build": "pegjs src/rockstar-parser.peg"
+    "build": "pegjs src/rockstar-parser.peg",
+    "prepublish": "npm run build"
   }
 }

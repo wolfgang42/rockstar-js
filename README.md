@@ -5,7 +5,6 @@ It transpiles Rockstar code to JavaScript.
 Usage:
 ```
 yarn install
-yarn build
 ./rockstar program.rock
 node program.js
 ```
@@ -38,6 +37,8 @@ into this token:
 {t: "Set", v: {t: "Variable", n: "Billy"}, e: {t: "Literal", v: "hello world!"}}
 ```
 (Notice that this token contains two other tokens, `v` and `e`.)
+
+**Note for developers:** After changing `rockstar-parser.peg`, make sure you run `yarn build` to regenerate the parser code.
 
 ## Block grouping
 The parsing step returns a series of statements, but does not know about blocks. This step (implemented by the `groupBlocks` function) finds statements which begin blocks (`If`, `While`, and so on) and groups the statements together inside a `Block` token, removing `BlankLine` tokens.
