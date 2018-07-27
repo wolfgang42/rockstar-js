@@ -1,12 +1,22 @@
 #!/usr/bin/env node
 const rockstar = require('./src/rockstar')
-const fs = require('fs-extra')
+const fs = require('fs')
+
+function promisify(fn, ...args) {
+	return new Promise((resolve, reject) => fn(...args, (err, result) => {
+		if (err) {
+			reject(err)
+		} else {
+			resolve(result)
+		}
+	}))
+}
 
 const filename = process.argv[2]
 
-fs.readFile(filename, 'utf-8')
+promisify(fs.readFile, filename, 'utf-8')
 .then(rockstar.compile)
-.then(code => fs.writeFile(filename.replace('.rock', '.js'), code))
+.then(code => promisify(fs.writeFile, filename.replace('.rock', '.js'), code))
 .then(null, e => {
 	console.error(e)
 	process.exit(1)
