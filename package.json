@@ -14,10 +14,12 @@
   },
   "dependencies": {},
   "devDependencies": {
+    "mocha": "^5.2.0",
     "pegjs": "^0.10.0"
   },
   "scripts": {
     "build": "pegjs src/rockstar-parser.peg",
+    "test": "mocha",
     "prepublish": "npm run build"
   }
 }
