@@ -10,7 +10,12 @@ Variable =
 CommonVariable = ('the'i/'my'i/'your'i) _ v:$([a-z]+) {return v}
 ProperWord = $([A-Z][A-Za-z]+)
 ProperVariable = $(ProperWord _ ProperVariable) / $ProperWord
-Pronoun = ('it'i/'he'i/'she'i/'him'i/'her'i/'them'i/'they'i)
+Pronoun = (
+	'it'i
+	/'he'i/'she'i/'him'i/'her'i
+	/'them'i/'they'i
+	/'ze'i/'hir'i/'zie'i/'zir'i/'xe'i/'xem'i/'ve'i/'ver'i
+)
 
 TypeLiteral = v:TypeLiteralValue { return {t: 'Literal', v} }
 TypeLiteralValue =
