@@ -42,7 +42,7 @@ PoeticString = v:Variable _ 'says' ' ' t:$[^\n]*
 PoeticNumber = n:PoeticDigits d:PoeticDecimal? {return {t: 'Literal', v: parseFloat(d?n+'.'+d:n)}}
 PoeticDecimal = '.' _ d:PoeticDigits {return d}
 PoeticDigits =
-	l:PoeticDigit _ r:PoeticDigits { return l+r }
+	l:PoeticDigit ( _ / [\',;:?!] )+ r:PoeticDigits { return l+r }
 	/ d: PoeticDigit { return d }
 PoeticDigit = t:[A-Za-z]+ {return (t.length%10).toString()}
 
