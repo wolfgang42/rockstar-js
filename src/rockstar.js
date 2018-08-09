@@ -95,8 +95,10 @@ function _groupBlocks(statements) {
 	return ret
 }
 function groupBlocks(statements) {
-	const ret = _groupBlocks(statements)
-	if (statements.length !== 0) throw new Error('Too many blank lines, left last block with some program left')
+	const ret = []
+	while (statements.length !== 0) {
+		_groupBlocks(statements).forEach(s => ret.push(s))
+	}
 	return ret
 }
 
