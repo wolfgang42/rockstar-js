@@ -1,5 +1,6 @@
 {
   "name": "rockstar-js",
+  "version": "0.0.1",
   "description": "JavaScript transpiler for the esoteric language 'Rockstar'",
   "homepage": "https://github.com/wolfgang42/rockstar-js",
   "bugs": "https://github.com/wolfgang42/rockstar-js/issues",
