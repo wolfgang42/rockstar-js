@@ -116,7 +116,8 @@ function generateDependencies(deps) {
 }
 
 function parse(programText) {
-	return parser.parse(programText)
+	// Parser requires newline before EOF, add it in case there wasn't one already.
+	return parser.parse(programText+'\n')
 }
 
 function compile(programText) {
