@@ -7,7 +7,7 @@ Comment = '(' [^)]* ')'
 Variable =
 	(n:(CommonVariable / ProperVariable) {return {t: 'Variable', n}})
 	/ Pronoun {return {t: 'Pronoun'}}
-CommonVariable = ('the'i/'my'i/'your'i) _ v:$([a-z]+) {return v}
+CommonVariable = p:('the'i/'my'i/'your'i) _ v:$([a-z]+) {return p+v}
 ProperWord = $([A-Z][A-Za-z]+)
 ProperVariable = $(ProperWord _ ProperVariable) / $ProperWord
 Pronoun = (

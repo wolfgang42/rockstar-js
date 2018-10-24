@@ -1,3 +1,4 @@
 node_modules/
 examples/*.js
 rockstar-parser.js
+package-lock.json
